@@ -1,0 +1,89 @@
+import pygame, sys
+import math
+
+#Class Definitions
+class Ship(pygame.sprite.Sprite):
+  def __init__(self,groups):
+    super().__init__(groups)
+    self.image = pygame.image.load("Sprites/player.png").convert_alpha()
+    self.image_og = self.image
+    self.rect = self.image.get_rect(center =(SCREEN_W/2,SCREEN_H/2))
+    self.current_angle = 90
+    self.x = SCREEN_W/2
+    self.y = SCREEN_H/2
+    self.speed = 10
+
+  def movement(self):
+    current_keys = pygame.key.get_pressed()
+    if current_keys[pygame.K_w]:
+      #Remove pass statement and move ship forward!
+      self.x += self.speed*(math.cos(math.radians(self.current_angle)))
+      self.y -= self.speed*(math.sin(math.radians(self.current_angle)))
+      self.rect.center = (self.x,self.y)
+      #print(math.cos(math.radians(self.current_angle)))
+      #print(-(math.sin(math.radians(self.current_angle))))
+      #print(f'current angle {self.current_angle}')
+      
+    if current_keys[pygame.K_d]:
+      #Remove pass statement and move ship forward!
+      self.current_angle -= 6
+      if self.current_angle < 0:
+        self.current_angle = 359
+      self.image = pygame.transform.rotozoom(self.image_og,(self.current_angle - 90), 1.0)
+      self.rect.center = (self.x, self.y)
+      #print(self.current_angle)
+    
+      
+    if current_keys[pygame.K_a]:
+      #Remove pass statement and move ship forward!
+      self.current_angle += 4
+      if self.current_angle > 359:
+        self.current_angle = 0
+      self.rect.center = (self.x, self.y)
+      self.image = pygame.transform.rotozoom(self.image_og,(self.current_angle - 90), 1.0)
+      #print(self.current_angle)
+
+    #Repeat this process for left/A and right/D - Rotozoom
+    
+  def update(self):
+    self.movement()
+    
+
+    
+#Game Setup
+    
+pygame.init()
+pygame.display.set_caption('Asteroid Clone - OOP')
+SCREEN_W, SCREEN_H = 1280, 720 
+display_surface = pygame.display.set_mode((SCREEN_W, SCREEN_H),pygame.FULLSCREEN)
+clock = pygame.time.Clock()
+
+#Game Files
+background = pygame.image.load("Sprites/background.png").convert()
+
+#Game Sprites
+spaceship_group = pygame.sprite.GroupSingle()
+ship = Ship(spaceship_group)
+
+#Main Game Loop
+while True:
+  for event in pygame.event.get():
+    if event.type == pygame.QUIT:
+      pygame.quit()
+      sys.exit()
+
+  clock.tick(30)
+  #Primary Background
+  display_surface.blit(background,(0,0))
+
+  #Delta Time - Managing Velocity and FR
+  dt = clock.tick() / 1000
+
+  #Updates
+  ship.update()
+  
+  #Draw Call - Sprites
+  spaceship_group.draw(display_surface)
+
+	#Draw Call - Final
+  pygame.display.update()
